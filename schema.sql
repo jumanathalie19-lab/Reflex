@@ -19,6 +19,7 @@ CREATE TABLE Deliveries (
     customer_phone VARCHAR(20) NOT NULL,
     delivery_address VARCHAR(255) NOT NULL,
     item_description VARCHAR(255) NOT NULL,
+     qr_code VARCHAR(100) NULL,
     status ENUM('OPEN', 'ASSIGNED', 'PICKED_UP', 'DELIVERED')
         NOT NULL DEFAULT 'OPEN',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
