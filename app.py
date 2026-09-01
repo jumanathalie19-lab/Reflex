@@ -533,6 +533,13 @@ def update_delivery_status(delivery_id):
 
         if connection and connection.is_connected():
             connection.close()
+# ---------------------------------------------------
+# RETAILER FRONTEND PAGE
+# ---------------------------------------------------
+
+@app.route("/retailer")
+def retailer_page():
+    return render_template("retailer.html")
 
 
 # ---------------------------------------------------
