@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reflex - Dispatcher</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dispatcher.css') }}">
+</head>
+
+<body>
+
+<header>
+    <div>
+        <h1>Reflex</h1>
+        <p>Dispatcher Dashboard</p>
+    </div>
+
+    <nav>
+        <a href="/">Dashboard</a>
+        <a href="/retailer">Retailer</a>
+        <a href="/dispatcher" class="active">Dispatcher</a>
+        <a href="/rider">Rider</a>
+    </nav>
+</header>
+
+<main>
+
+    <section class="top-section">
+        <div>
+            <h2>Delivery Assignment</h2>
+            <p>
+                View open delivery requests and assign them to available riders.
+            </p>
+        </div>
+
+        <button id="refreshBtn" onclick="loadDispatcherData()">
+            Refresh
+        </button>
+    </section>
+
+    <div id="message"></div>
+
+    <section class="dispatcher-grid">
+
+        <!-- OPEN DELIVERIES -->
+        <div class="panel">
+
+            <div class="panel-header">
+                <div>
+                    <h2>Open Deliveries</h2>
+                    <p>Delivery requests waiting for assignment.</p>
+                </div>
+
+                <span id="deliveryCount" class="count">0</span>
+            </div>
+
+            <div id="deliveries" class="delivery-list">
+                <p class="empty">
+                    Loading deliveries...
+                </p>
+            </div>
+
+        </div>
+
+        <!-- RIDERS -->
+        <div class="panel">
+
+            <div class="panel-header">
+                <div>
+                    <h2>Available Riders</h2>
+                    <p>Select a rider when assigning a delivery.</p>
+                </div>
+
+                <span id="riderCount" class="count">0</span>
+            </div>
+
+            <div id="riders" class="rider-list">
+                <p class="empty">
+                    Loading riders...
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script src="{{ url_for('static', filename='js/dispatcher.js') }}"></script>
+
+</body>
+</html>

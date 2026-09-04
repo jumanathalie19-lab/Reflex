@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reflex - Rider</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/rider.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Reflex</h1>
+        <p>Rider Dashboard</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>Who are you?</h2>
+            <p class="description">
+                No login system yet (see trade-off log) — enter your Rider ID
+                to load your active deliveries.
+            </p>
+            <div class="rider-id-row">
+                <input type="number" id="riderIdInput" placeholder="Your Rider ID, e.g. 3">
+                <button onclick="loadMyDeliveries()">Load My Deliveries</button>
+            </div>
+        </section>
+
+        <section>
+            <h2>My Active Deliveries</h2>
+            <div id="deliveries">
+                <p class="empty-hint">Enter your Rider ID above and click Load.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/rider.js') }}"></script>
+</body>
+</html>
