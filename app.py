@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request, render_template
 import mysql.connector
 from mysql.connector import Error
 from config import Config
+from sms_service import send_sms
 
 
 app = Flask(__name__)
@@ -391,7 +392,7 @@ def assign_delivery(delivery_id):
 
         # Check delivery exists
         cursor.execute("""
-            SELECT delivery_id, status
+            SELECT delivery_id, status, customer_phone, customer_name
             FROM deliveries
             WHERE delivery_id = %s
         """, (delivery_id,))
@@ -430,6 +431,13 @@ def assign_delivery(delivery_id):
         """, (rider_id, qr_code, delivery_id))
 
         connection.commit()
+
+        # Notify the customer via SMS (stub - see sms_service.py)
+        send_sms(
+            delivery["customer_phone"],
+            f"Hi {delivery['customer_name']}, your Reflex delivery has "
+            f"been assigned to a rider and is on its way."
+        )
 
         return jsonify({
             "message": "Delivery assigned successfully",
@@ -566,7 +574,8 @@ def qr_confirm_delivery(delivery_id):
         cursor = connection.cursor(dictionary=True)
 
         cursor.execute("""
-            SELECT delivery_id, status, rider_id, qr_code
+            SELECT delivery_id, status, rider_id, qr_code,
+                   customer_phone, customer_name
             FROM deliveries
             WHERE delivery_id = %s
         """, (delivery_id,))
@@ -609,6 +618,13 @@ def qr_confirm_delivery(delivery_id):
         """, (delivery_id,))
 
         connection.commit()
+
+        # Notify the customer via SMS (stub - see sms_service.py)
+        send_sms(
+            delivery["customer_phone"],
+            f"Hi {delivery['customer_name']}, your Reflex delivery has "
+            f"been confirmed as delivered. Thank you!"
+        )
 
         return jsonify({
             "message": "Delivery confirmed via QR scan",
