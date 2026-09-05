@@ -1,33 +1,78 @@
-"""
-SMS stub for Reflex.
 
-In production this would call a real SMS gateway (e.g. Africa's Talking)
-to actually send a text message to a customer or retailer. For this
-sprint, it's a stub: it does not send a real message, it just logs
-what WOULD have been sent.
-
-This lets the rest of the app (assign_delivery, qr_confirm_delivery)
-call send_sms() today exactly the way it would call a real gateway,
-so swapping in the real integration later means changing only this
-file, not any of the routes that use it.
-"""
+# ============================================================
+# REFLEX SMS SERVICE
+# ============================================================
+#
+# This is currently a development/testing SMS service.
+#
+# It does NOT send real SMS messages.
+# Instead, it prints the message to the Flask terminal.
+#
+# Later, this function can be connected to a real SMS provider
+# such as Africa's Talking without changing the delivery
+# endpoints that call send_sms().
+#
+# ============================================================
 
 
 def send_sms(phone_number, message):
     """
-    Stub SMS sender.
+    Simulate sending an SMS message.
 
     Args:
-        phone_number: the recipient's phone number (string)
-        message: the text to send (string)
+        phone_number (str):
+            Customer's phone number.
+
+        message (str):
+            SMS message to send.
 
     Returns:
-        A dict describing what was "sent" - useful for logging/testing.
+        dict:
+            Information about the simulated SMS.
     """
-    print(f"[SMS STUB] To: {phone_number} | Message: {message}")
 
+    # Make sure the values are strings
+    phone_number = str(phone_number).strip()
+    message = str(message).strip()
+
+    # Basic validation
+    if not phone_number:
+        print("[SMS STUB] ERROR: Phone number is missing.")
+
+        return {
+            "status": "failed",
+            "to": phone_number,
+            "message": message,
+            "error": "Phone number is required"
+        }
+
+    if not message:
+        print("[SMS STUB] ERROR: Message is empty.")
+
+        return {
+            "status": "failed",
+            "to": phone_number,
+            "message": message,
+            "error": "Message is required"
+        }
+
+    # --------------------------------------------------------
+    # DEVELOPMENT SMS OUTPUT
+    # --------------------------------------------------------
+
+    print()
+    print("=" * 60)
+    print("[REFLEX SMS STUB]")
+    print(f"To      : {phone_number}")
+    print(f"Message : {message}")
+    print("Status  : SMS simulated successfully")
+    print("=" * 60)
+    print()
+
+    # Return useful information to the calling endpoint
     return {
         "status": "stubbed",
         "to": phone_number,
         "message": message
     }
+
