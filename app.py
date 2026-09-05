@@ -1,3 +1,4 @@
+
 from flask import Flask, jsonify, request, render_template
 import mysql.connector
 from mysql.connector import Error
@@ -367,6 +368,7 @@ def create_delivery():
 
 # ---------------------------------------------------
 # ASSIGN DELIVERY TO RIDER
+
 # ---------------------------------------------------
 
 @app.route("/api/deliveries/<int:delivery_id>/assign", methods=["PUT"])
@@ -415,13 +417,7 @@ def assign_delivery(delivery_id):
                 "error": "Rider not found"
             }), 404
 
-        # Assign rider
-        cursor.execute("""
-            UPDATE deliveries
-            SET rider_id = %s,
-                status = 'Assigned'
-            WHERE delivery_id = %s
-        """, (rider_id, delivery_id))
+
 
         connection.commit()
 
@@ -429,7 +425,7 @@ def assign_delivery(delivery_id):
             "message": "Delivery assigned successfully",
             "delivery_id": delivery_id,
             "rider_id": rider_id,
-            "status": "Assigned"
+
         })
 
     except Error as error:
@@ -533,13 +529,7 @@ def update_delivery_status(delivery_id):
 
         if connection and connection.is_connected():
             connection.close()
-# ---------------------------------------------------
-# RETAILER FRONTEND PAGE
-# ---------------------------------------------------
 
-@app.route("/retailer")
-def retailer_page():
-    return render_template("retailer.html")
 
 
 # ---------------------------------------------------

@@ -47,4 +47,4 @@ async function loadDeliveries() {
         container.innerHTML =
             "<p>Unable to load deliveries.</p>";
     }
-}
+
