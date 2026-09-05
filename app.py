@@ -1,4 +1,4 @@
-import secrets
+
 from flask import Flask, jsonify, request, render_template
 import mysql.connector
 from mysql.connector import Error
@@ -368,7 +368,7 @@ def create_delivery():
 
 # ---------------------------------------------------
 # ASSIGN DELIVERY TO RIDER
-# (generates the QR code for this delivery at the same time)
+
 # ---------------------------------------------------
 
 @app.route("/api/deliveries/<int:delivery_id>/assign", methods=["PUT"])
@@ -417,17 +417,7 @@ def assign_delivery(delivery_id):
                 "error": "Rider not found"
             }), 404
 
-        # Generate a unique QR code for this delivery
-        qr_code = secrets.token_hex(8)  # e.g. "a13f9c2e8b7d4f10"
 
-        # Assign rider and attach QR code
-        cursor.execute("""
-            UPDATE deliveries
-            SET rider_id = %s,
-                status = 'Assigned',
-                qr_code = %s
-            WHERE delivery_id = %s
-        """, (rider_id, qr_code, delivery_id))
 
         connection.commit()
 
@@ -435,8 +425,7 @@ def assign_delivery(delivery_id):
             "message": "Delivery assigned successfully",
             "delivery_id": delivery_id,
             "rider_id": rider_id,
-            "status": "Assigned",
-            "qr_code": qr_code
+
         })
 
     except Error as error:
@@ -541,94 +530,6 @@ def update_delivery_status(delivery_id):
         if connection and connection.is_connected():
             connection.close()
 
-
-# ---------------------------------------------------
-# QR CONFIRM DELIVERY
-# ---------------------------------------------------
-
-@app.route("/api/deliveries/<int:delivery_id>/qr-confirm", methods=["POST"])
-def qr_confirm_delivery(delivery_id):
-    data = request.get_json()
-
-    if not data or not data.get("qr_code") or not data.get("rider_id"):
-        return jsonify({
-            "error": "qr_code and rider_id are required"
-        }), 400
-
-    submitted_code = data["qr_code"]
-    rider_id = data["rider_id"]
-
-    connection = None
-    cursor = None
-
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
-
-        cursor.execute("""
-            SELECT delivery_id, status, rider_id, qr_code
-            FROM deliveries
-            WHERE delivery_id = %s
-        """, (delivery_id,))
-
-        delivery = cursor.fetchone()
-
-        if not delivery:
-            return jsonify({
-                "error": "Delivery not found"
-            }), 404
-
-        # Confirm this rider is actually the one assigned
-        if delivery["rider_id"] != rider_id:
-            return jsonify({
-                "error": "This rider is not assigned to this delivery"
-            }), 403
-
-        current_status = delivery["status"]
-
-        # Only a delivery sitting at 'Picked Up' can be QR-confirmed
-        if current_status != "Picked Up":
-            return jsonify({
-                "error": f"Cannot QR-confirm a delivery with status '{current_status}'. "
-                         f"Delivery must be 'Picked Up' first."
-            }), 400
-
-        # Check the code matches
-        if not delivery["qr_code"] or submitted_code != delivery["qr_code"]:
-            return jsonify({
-                "error": "QR code does not match this delivery",
-                "result": "fail"
-            }), 409
-
-        # Success — advance status to Delivered
-        cursor.execute("""
-            UPDATE deliveries
-            SET status = 'Delivered',
-                qr_scanned_at = NOW()
-            WHERE delivery_id = %s
-        """, (delivery_id,))
-
-        connection.commit()
-
-        return jsonify({
-            "message": "Delivery confirmed via QR scan",
-            "delivery_id": delivery_id,
-            "previous_status": current_status,
-            "status": "Delivered",
-            "result": "success"
-        })
-
-    except Error as error:
-        return jsonify({
-            "error": str(error)
-        }), 500
-
-    finally:
-        if cursor:
-            cursor.close()
-
-        if connection and connection.is_connected():
-            connection.close()
 
 
 # ---------------------------------------------------
